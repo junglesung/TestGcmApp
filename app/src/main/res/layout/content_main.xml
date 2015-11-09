@@ -20,4 +20,12 @@
         android:id="@+id/buttonGetToken"
         android:layout_below="@+id/textViewInfo"
         android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send token"
+        android:id="@+id/buttonSendToken"
+        android:layout_alignTop="@+id/buttonGetToken"
+        android:layout_toEndOf="@+id/buttonGetToken" />
 </RelativeLayout>

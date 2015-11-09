@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private Button buttonGetToken;
+    private Button buttonSendToken;
     private TextView textViewInfo;
 
     @Override
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Get UI components
         buttonGetToken = (Button) findViewById(R.id.buttonGetToken);
+        buttonSendToken = (Button) findViewById(R.id.buttonSendToken);
         textViewInfo = (TextView) findViewById(R.id.textViewInfo);
 
         // Receive token
@@ -63,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 fetchToken();
+            }
+        });
+
+        buttonSendToken.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendRegistrationToServer();
             }
         });
 
@@ -138,5 +147,19 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Persist registration to third-party servers.
+     *
+     * Modify this method to associate the user's GCM registration token with any server-side account
+     * maintained by your application.
+     *
+     */
+    private void sendRegistrationToServer() {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(this);
+        String token = sharedPreferences.getString(MyConstants.REGISTRATION_TOKEN, "Hello world!");
+        // TODO: Send token
     }
 }
