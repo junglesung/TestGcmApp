@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">TestGcmApp</string>
     <string name="action_settings">Settings</string>
+    <string name="no_network_connection_available">No network connection available</string>
+    <string name="connection_error">Connection error</string>
+    <string name="create_failed_warning">Create failed, please correct data and send again.</string>
 </resources>
