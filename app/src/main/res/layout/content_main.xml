@@ -21,11 +21,19 @@
         android:layout_below="@+id/textViewInfo"
         android:layout_alignParentStart="true" />
 
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextMessage"
+        android:layout_below="@+id/buttonGetToken"
+        android:layout_alignParentStart="true"
+        android:text="Hello world~~~"/>
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Send token"
         android:id="@+id/buttonSendToken"
-        android:layout_alignTop="@+id/buttonGetToken"
-        android:layout_toEndOf="@+id/buttonGetToken" />
+        android:layout_below="@+id/editTextMessage"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
