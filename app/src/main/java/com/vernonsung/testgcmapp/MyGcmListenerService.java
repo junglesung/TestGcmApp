@@ -66,6 +66,8 @@ public class MyGcmListenerService extends GcmListenerService {
          * GcmListenerService will automatically send a notification.
          * Programmers may just set data fields to notification.
          */
+        // Some device won't send notification automatically when notification field is received.
+        // So it's important to send manually.
         sendNotification(message);
         // [END_EXCLUDE]
     }

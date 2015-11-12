@@ -45,8 +45,15 @@ public class MainActivity extends AppCompatActivity {
     // UI
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private Button buttonGetToken;
-    private Button buttonSendToken;
+    private Button buttonDeleteToken;
+    private Button buttonSendMessage;
+    private Button buttonSubscribeTopic;
+    private Button buttonUnsubscribeTopic;
+    private Button buttonJoinGroup;
+    private Button buttonLeaveGroup;
     private EditText editTextMessage;
+    private EditText editTextTopic;
+    private EditText editTextGroup;
     private TextView textViewInfo;
 
     // Constants
@@ -73,8 +80,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Get UI components
         buttonGetToken = (Button) findViewById(R.id.buttonGetToken);
-        buttonSendToken = (Button) findViewById(R.id.buttonSendToken);
+        buttonDeleteToken = (Button) findViewById(R.id.buttonDeleteToken);
+        buttonSendMessage = (Button) findViewById(R.id.buttonSendMessage);
+        buttonSubscribeTopic = (Button) findViewById(R.id.buttonSubscribeTopic);
+        buttonUnsubscribeTopic = (Button) findViewById(R.id.buttonUnsubscribeTopic);
+        buttonJoinGroup = (Button) findViewById(R.id.buttonJoinGroup);
+        buttonLeaveGroup = (Button) findViewById(R.id.buttonLeaveGroup);
         editTextMessage = (EditText) findViewById(R.id.editTextMessage);
+        editTextTopic = (EditText) findViewById(R.id.editTextTopic);
+        editTextGroup = (EditText) findViewById(R.id.editTextGroup);
         textViewInfo = (TextView) findViewById(R.id.textViewInfo);
 
         // Receive token
@@ -91,8 +105,14 @@ public class MainActivity extends AppCompatActivity {
                 fetchToken();
             }
         });
+        buttonDeleteToken.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteToken();
+            }
+        });
 
-        buttonSendToken.setOnClickListener(new View.OnClickListener() {
+        buttonSendMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 talkToServer();
@@ -129,6 +149,8 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(MyConstants.REGISTRATION_COMPLETE));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(MyConstants.UNREGISTRATION_COMPLETE));
     }
 
     @Override
@@ -140,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
     private void showToken() {
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(this);
-        String token = sharedPreferences.getString(MyConstants.REGISTRATION_TOKEN, "Hello world!");
+        String token = sharedPreferences.getString(MyConstants.REGISTRATION_TOKEN, "Start here~ Get a token first!");
         textViewInfo.setText(token);
     }
 
@@ -148,6 +170,14 @@ public class MainActivity extends AppCompatActivity {
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
             Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
+    }
+
+    private void deleteToken() {
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, UnregistrationIntentService.class);
             startService(intent);
         }
     }
@@ -183,6 +213,8 @@ public class MainActivity extends AppCompatActivity {
         }
         // Prepare data
         String message = editTextMessage.getText().toString();
+        // Vernon debug
+        Log.d(LOG_TAG, "Say: " + message);
         // Execute uploading thread
         if (mHelloServerTask != null && mHelloServerTask.getStatus() == AsyncTask.Status.RUNNING) {
             Log.d(LOG_TAG, "Last message is still sending");

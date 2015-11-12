@@ -64,6 +64,10 @@
             android:name=".RegistrationIntentService"
             android:exported="false">
         </service>
+        <service
+            android:name=".UnregistrationIntentService"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

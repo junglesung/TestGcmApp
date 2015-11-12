@@ -9,7 +9,9 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_main" tools:context=".MainActivity">
 
-    <TextView android:text="Hello World!" android:layout_width="wrap_content"
+    <TextView
+        android:text="Start here~ Get a token first!"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewInfo" />
 
@@ -18,7 +20,23 @@
         android:layout_height="wrap_content"
         android:text="Get token"
         android:id="@+id/buttonGetToken"
-        android:layout_below="@+id/textViewInfo"
+        android:layout_below="@id/textViewInfo"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete token"
+        android:id="@+id/buttonDeleteToken"
+        android:layout_below="@id/textViewInfo"
+        android:layout_toEndOf="@id/buttonGetToken" />
+
+    <TextView
+        android:text="Message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewMessage"
+        android:layout_below="@id/buttonGetToken"
         android:layout_alignParentStart="true" />
 
     <EditText
@@ -26,14 +44,78 @@
         android:layout_height="wrap_content"
         android:id="@+id/editTextMessage"
         android:layout_below="@+id/buttonGetToken"
-        android:layout_alignParentStart="true"
-        android:text="Hello world~~~"/>
+        android:layout_toEndOf="@id/textViewMessage"
+        android:text="Hello world~~~" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send token"
-        android:id="@+id/buttonSendToken"
-        android:layout_below="@+id/editTextMessage"
+        android:text="Send"
+        android:id="@+id/buttonSendMessage"
+        android:layout_below="@+id/buttonGetToken"
+        android:layout_toEndOf="@+id/editTextMessage" />
+
+    <TextView
+        android:text="Topic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewTopic"
+        android:layout_below="@id/buttonSendMessage"
         android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextTopic"
+        android:layout_below="@+id/buttonSendMessage"
+        android:layout_toEndOf="@id/textViewTopic"
+        android:text="TopicAAA" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Subscribe"
+        android:id="@+id/buttonSubscribeTopic"
+        android:layout_below="@+id/buttonSendMessage"
+        android:layout_toEndOf="@+id/editTextTopic" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Unsubscribe"
+        android:id="@+id/buttonUnsubscribeTopic"
+        android:layout_alignTop="@+id/buttonSubscribeTopic"
+        android:layout_toEndOf="@+id/buttonSubscribeTopic" />
+
+    <TextView
+        android:text="Group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewGroup"
+        android:layout_below="@id/buttonSubscribeTopic"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/editTextGroup"
+        android:layout_below="@+id/buttonSubscribeTopic"
+        android:layout_toEndOf="@id/textViewGroup"
+        android:text="GroupBBB"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Join"
+        android:id="@+id/buttonJoinGroup"
+        android:layout_below="@+id/buttonSubscribeTopic"
+        android:layout_toEndOf="@+id/editTextGroup" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Leave"
+        android:id="@+id/buttonLeaveGroup"
+        android:layout_below="@+id/buttonSubscribeTopic"
+        android:layout_toEndOf="@+id/buttonJoinGroup" />
 </RelativeLayout>
