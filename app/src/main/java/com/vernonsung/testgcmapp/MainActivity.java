@@ -170,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
             Intent intent = new Intent(this, RegistrationIntentService.class);
+            intent.setAction(MyConstants.ACTION_GET_TOKEN);
             startService(intent);
         }
     }
@@ -177,7 +178,8 @@ public class MainActivity extends AppCompatActivity {
     private void deleteToken() {
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
-            Intent intent = new Intent(this, UnregistrationIntentService.class);
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            intent.setAction(MyConstants.ACTION_DELETE_TOKEN);
             startService(intent);
         }
     }
