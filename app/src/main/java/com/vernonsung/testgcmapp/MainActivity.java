@@ -172,6 +172,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deleteToken() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String token = sharedPreferences.getString(MyConstants.REGISTRATION_TOKEN, "");
+        Boolean flagSent = sharedPreferences.getBoolean(MyConstants.SENT_TOKEN_TO_SERVER, false);
+
+        if (token == "" || flagSent == false) {
+            // Server hasn't received registration token yet
+            Log.d(LOG_TAG, "Server hasn't received registration token yet, it needn't unregister");
+            Toast.makeText(this, "Server hasn't received registration token yet, it needn't unregister", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Start the service to tell the server
         if (checkPlayServices()) {
             // Start IntentService to register this application with GCM.
             Intent intent = new Intent(this, RegistrationIntentService.class);

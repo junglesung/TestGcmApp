@@ -71,6 +71,11 @@ public class RegistrationIntentService extends IntentService {
             // [END get_token]
             Log.i(LOG_TAG, "GCM Registration Token: " + newToken);
 
+            // Store new token
+            if (newToken != oldToken) {
+                sharedPreferences.edit().putString(MyConstants.REGISTRATION_TOKEN, newToken).apply();
+            }
+
             // Update new token to server
             UserRegistration registration = new UserRegistration(oldToken, instanceID.getId(), newToken, "");
             if (sendTokenToServer(registration) != 0) {
@@ -84,8 +89,6 @@ public class RegistrationIntentService extends IntentService {
             // sent to your server. If the boolean is false, send the token to your server,
             // otherwise your server should have already received the token.
             sharedPreferences.edit().putBoolean(MyConstants.SENT_TOKEN_TO_SERVER, true).apply();
-            // Store token
-            sharedPreferences.edit().putString(MyConstants.REGISTRATION_TOKEN, newToken).apply();
             // [END register_for_gcm]
         } catch (Exception e) {
             Log.d(LOG_TAG, "Failed to complete token refresh because " + e.getMessage());
@@ -100,6 +103,14 @@ public class RegistrationIntentService extends IntentService {
 
     private void deleteToken() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String token = sharedPreferences.getString(MyConstants.REGISTRATION_TOKEN, "");
+        Boolean flagSent = sharedPreferences.getBoolean(MyConstants.SENT_TOKEN_TO_SERVER, false);
+
+        if (token == "" || flagSent == false) {
+            // Server hasn't received registration token yet
+            Log.d(LOG_TAG, "Duplicate unregistration request");
+            return;
+        }
 
         try {
             // [START unregister_for_gcm]
@@ -113,21 +124,21 @@ public class RegistrationIntentService extends IntentService {
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE);
             // [END delete_token]
 
+            // It's impractical to unregister from an APP server because it only happens when APP is uninstalled.
+            // But there is no way to execute code when uninstalling happens.
+            // APP servers should clean unused registration tokens periodically.
 
             // Now it won't receive messages
 
             // You should store a boolean that indicates whether the generated token has been
             // sent to your server. If the boolean is false, send the token to your server,
             // otherwise your server should have already received the token.
-            sharedPreferences.edit().putBoolean(MyConstants.SENT_TOKEN_TO_SERVER, false).apply();
+            sharedPreferences.edit().remove(MyConstants.SENT_TOKEN_TO_SERVER).apply();
             // Store token
             sharedPreferences.edit().remove(MyConstants.REGISTRATION_TOKEN).apply();
             // [END register_for_gcm]
         } catch (Exception e) {
             Log.d(LOG_TAG, "Failed to complete token deleting", e);
-            // If an exception happens while fetching the new token or updating our registration data
-            // on a third-party server, this ensures that we'll attempt the update at a later time.
-            sharedPreferences.edit().putBoolean(MyConstants.SENT_TOKEN_TO_SERVER, false).apply();
         }
         // Notify UI that registration has completed, so the progress indicator can be hidden.
         Intent unregistrationComplete = new Intent(MyConstants.UNREGISTRATION_COMPLETE);
