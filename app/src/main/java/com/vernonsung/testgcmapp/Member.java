@@ -65,6 +65,4 @@ public class Member {
         // Never send CreateTime to the server because it's determined by the server.
         return j;
     }
-
-
 }
