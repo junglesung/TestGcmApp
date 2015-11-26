@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -14,9 +13,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
+import com.google.gson.Gson;
 
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -77,7 +76,7 @@ public class RegistrationIntentService extends IntentService {
             }
 
             // Update new token to server
-            UserRegistration registration = new UserRegistration(oldToken, instanceID.getId(), newToken, "");
+            UserRegistration registration = new UserRegistration(instanceID.getId(), newToken);
             if (sendTokenToServer(registration) != 0) {
                 throw new Exception("Send token to server failed");
             }
@@ -103,14 +102,6 @@ public class RegistrationIntentService extends IntentService {
 
     private void deleteToken() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String token = sharedPreferences.getString(MyConstants.REGISTRATION_TOKEN, "");
-        Boolean flagSent = sharedPreferences.getBoolean(MyConstants.SENT_TOKEN_TO_SERVER, false);
-
-        if (token == "" || flagSent == false) {
-            // Server hasn't received registration token yet
-            Log.d(LOG_TAG, "Duplicate unregistration request");
-            return;
-        }
 
         try {
             // [START unregister_for_gcm]
@@ -165,7 +156,7 @@ public class RegistrationIntentService extends IntentService {
         String userUrl;
 
         try {
-            url = new URL(MyConstants.USER_REGISTRATION_URL + "/" + registration.getInstanceId());
+            url = new URL(MyConstants.USER_REGISTRATION_URL);
             urlConnection = (HttpsURLConnection) url.openConnection();
 
             // Set HTTP method
@@ -178,8 +169,7 @@ public class RegistrationIntentService extends IntentService {
             urlConnection.setDoOutput(true);
 
             // Convert item to JSON string
-            data = registration.toJSONObject().toString().getBytes();
-//            data = new Gson().toJson(registration).getBytes();
+            data = new Gson().toJson(registration).getBytes();
 
             // For best performance, you should call either setFixedLengthStreamingMode(int) when the body length is known in advance, or setChunkedStreamingMode(int) when it is not. Otherwise HttpURLConnection will be forced to buffer the complete request body in memory before it is transmitted, wasting (and possibly exhausting) heap and increasing latency.
             size = data.length;

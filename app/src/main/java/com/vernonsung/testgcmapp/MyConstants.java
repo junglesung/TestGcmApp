@@ -11,7 +11,7 @@ public class MyConstants {
     // URL
     public static final String APP_SERVER_URL_BASE = "https://testgcmserver-1120.appspot.com/api/0.1";
     public static final String ECHO_URL = APP_SERVER_URL_BASE + "/tokens";
-    public static final String USER_REGISTRATION_URL = APP_SERVER_URL_BASE + "/users";
+    public static final String USER_REGISTRATION_URL = APP_SERVER_URL_BASE + "/myself";
     public static final String USER_MESSAGE_URL = APP_SERVER_URL_BASE + "/users";
 
     // Values
