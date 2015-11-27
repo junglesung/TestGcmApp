@@ -11,11 +11,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.google.gson.Gson;
 
 import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -47,6 +49,12 @@ public class RegistrationIntentService extends IntentService {
                 break;
             case MyConstants.ACTION_DELETE_TOKEN:
                 deleteToken();
+                break;
+            case MyConstants.ACTION_SUBSCRIBE_TOPIC:
+                subscribeTopic(intent.getStringExtra(MyConstants.TOPIC));
+                break;
+            case MyConstants.ACTION_UNSUBSCRIBE_TOPIC:
+                unsubscribeTopic(intent.getStringExtra(MyConstants.TOPIC));
                 break;
             default:
                 Log.d(LOG_TAG, "Registration service received an unrecognized action");
@@ -154,7 +162,6 @@ public class RegistrationIntentService extends IntentService {
         int ret = 0;
         byte[] data;
         OutputStream out;
-        String userUrl;
 
         try {
             url = new URL(MyConstants.USER_REGISTRATION_URL);
@@ -210,7 +217,7 @@ public class RegistrationIntentService extends IntentService {
             // Save user ID to preference
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             String oldId = sharedPreferences.getString(MyConstants.USER_ID, "");
-            if (oldId != userId) {
+            if (!oldId.equals(userId)) {
                 sharedPreferences.edit().putString(MyConstants.USER_ID, userId).apply();
             }
         } catch (Exception e) {
@@ -222,5 +229,33 @@ public class RegistrationIntentService extends IntentService {
         }
 
         return ret;
+    }
+
+    private void subscribeTopic(String topic) {
+        String token = PreferenceManager.getDefaultSharedPreferences(this).getString(MyConstants.REGISTRATION_TOKEN, "");
+        GcmPubSub pubSub = GcmPubSub.getInstance(this);
+        try {
+            pubSub.subscribe(token, "/topics/" + topic, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        // Notify UI that registration has completed, so the progress indicator can be hidden.
+        Intent registrationComplete = new Intent(MyConstants.SUBSCRIPTION_COMPLETE);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
+    }
+
+    private void unsubscribeTopic(String topic) {
+        String token = PreferenceManager.getDefaultSharedPreferences(this).getString(MyConstants.REGISTRATION_TOKEN, "");
+        GcmPubSub pubSub = GcmPubSub.getInstance(this);
+        try {
+            pubSub.unsubscribe(token, "/topics/" + topic);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        // Notify UI that registration has completed, so the progress indicator can be hidden.
+        Intent registrationComplete = new Intent(MyConstants.UNSUBSCRIBING_COMPLETE);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 }

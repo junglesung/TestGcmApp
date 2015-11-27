@@ -28,9 +28,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.iid.InstanceID;
 import com.google.gson.Gson;
-import com.google.gson.JsonParser;
-
-import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -42,12 +39,15 @@ import javax.net.ssl.HttpsURLConnection;
 public class MainActivity extends AppCompatActivity {
     // Threads
     SendUserMessageTask mSendUserMessageTask;
+    SendTopicMessageTask mSendTopicMessageTask;
 
     // UI
     private BroadcastReceiver mRegistrationBroadcastReceiver;
     private Button buttonGetToken;
     private Button buttonDeleteToken;
-    private Button buttonSendMessage;
+    private Button buttonSendUserMessage;
+    private Button buttonSendTopicMessage;
+    private Button buttonSendGroupMessage;
     private Button buttonSubscribeTopic;
     private Button buttonUnsubscribeTopic;
     private Button buttonJoinGroup;
@@ -80,7 +80,9 @@ public class MainActivity extends AppCompatActivity {
         // Get UI components
         buttonGetToken = (Button) findViewById(R.id.buttonGetToken);
         buttonDeleteToken = (Button) findViewById(R.id.buttonDeleteToken);
-        buttonSendMessage = (Button) findViewById(R.id.buttonSendMessage);
+        buttonSendUserMessage = (Button) findViewById(R.id.buttonSendUserMessage);
+        buttonSendTopicMessage = (Button) findViewById(R.id.buttonSendTopicMessage);
+        buttonSendGroupMessage = (Button) findViewById(R.id.buttonSendGroupMessage);
         buttonSubscribeTopic = (Button) findViewById(R.id.buttonSubscribeTopic);
         buttonUnsubscribeTopic = (Button) findViewById(R.id.buttonUnsubscribeTopic);
         buttonJoinGroup = (Button) findViewById(R.id.buttonJoinGroup);
@@ -94,7 +96,24 @@ public class MainActivity extends AppCompatActivity {
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                showToken();
+                // Identify action
+                String action = intent.getAction();
+                switch (action) {
+                    case MyConstants.REGISTRATION_COMPLETE:
+                        showToken();
+                        break;
+                    case MyConstants.UNREGISTRATION_COMPLETE:
+                        showToken();
+                        break;
+                    case MyConstants.SUBSCRIPTION_COMPLETE:
+                        Toast.makeText(MainActivity.this, "Subscribe topic successfully", Toast.LENGTH_SHORT).show();
+                        break;
+                    case MyConstants.UNSUBSCRIBING_COMPLETE:
+                        Toast.makeText(MainActivity.this, "Unsubscribe topic successfully", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        Log.d(LOG_TAG, "Main activity received an unrecognized action");
+                }
             }
         };
 
@@ -110,10 +129,34 @@ public class MainActivity extends AppCompatActivity {
                 deleteToken();
             }
         });
-        buttonSendMessage.setOnClickListener(new View.OnClickListener() {
+        buttonSendUserMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendUserMessage();
+            }
+        });
+        buttonSendTopicMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendTopicMessage();
+            }
+        });
+//        buttonSendGroupMessage.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                sendGroupMessage();
+//            }
+//        });
+        buttonSubscribeTopic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                subscribeTopic();
+            }
+        });
+        buttonUnsubscribeTopic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                unsubscribeTopic();
             }
         });
 
@@ -149,6 +192,10 @@ public class MainActivity extends AppCompatActivity {
                 new IntentFilter(MyConstants.REGISTRATION_COMPLETE));
         LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
                 new IntentFilter(MyConstants.UNREGISTRATION_COMPLETE));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(MyConstants.SUBSCRIPTION_COMPLETE));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                new IntentFilter(MyConstants.UNSUBSCRIBING_COMPLETE));
     }
 
     @Override
@@ -195,6 +242,66 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void subscribeTopic() {
+        // Get topic name
+        String topic = editTextTopic.getText().toString();
+        if (topic.isEmpty()) {
+            Toast.makeText(this, "Please give a topic name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check Google Cloud Messaging registration
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String token = sharedPreferences.getString(MyConstants.REGISTRATION_TOKEN, "");
+        Boolean flagSent = sharedPreferences.getBoolean(MyConstants.SENT_TOKEN_TO_SERVER, false);
+
+        if (token.isEmpty() || !flagSent) {
+            // Server hasn't received registration token yet
+            Log.d(LOG_TAG, "Server hasn't received registration token yet, it needn't unregister");
+            Toast.makeText(this, "Server hasn't received registration token yet, it needn't unregister", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Start the service to tell the server
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            intent.setAction(MyConstants.ACTION_SUBSCRIBE_TOPIC);
+            intent.putExtra(MyConstants.TOPIC, topic);
+            startService(intent);
+        }
+    }
+
+    private void unsubscribeTopic() {
+        // Get topic name
+        String topic = editTextTopic.getText().toString();
+        if (topic.isEmpty()) {
+            Toast.makeText(this, "Please give a topic name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check Google Cloud Messaging registration
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String token = sharedPreferences.getString(MyConstants.REGISTRATION_TOKEN, "");
+        Boolean flagSent = sharedPreferences.getBoolean(MyConstants.SENT_TOKEN_TO_SERVER, false);
+
+        if (token.isEmpty() || !flagSent) {
+            // Server hasn't received registration token yet
+            Log.d(LOG_TAG, "Server hasn't received registration token yet, it needn't unregister");
+            Toast.makeText(this, "Server hasn't received registration token yet, it needn't unregister", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Start the service to tell the server
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            intent.setAction(MyConstants.ACTION_UNSUBSCRIBE_TOPIC);
+            intent.putExtra(MyConstants.TOPIC, topic);
+            startService(intent);
+        }
+    }
+
     /**
      * Check the device to make sure it has the Google Play Services APK. If
      * it doesn't, display a dialog that allows users to download the APK from
@@ -227,8 +334,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Prepare data
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String userId = sharedPreferences.getString(MyConstants.USER_ID, "");
         String instanceID = InstanceID.getInstance(this).getId();
+        String userId = sharedPreferences.getString(MyConstants.USER_ID, "");
         String message = editTextMessage.getText().toString();
         boolean flagRegisteredServer = sharedPreferences.getBoolean(MyConstants.SENT_TOKEN_TO_SERVER, false);
         UserMessage userMessage = new UserMessage(instanceID, userId, message);
@@ -305,6 +412,129 @@ public class MainActivity extends AppCompatActivity {
 
                 // Convert item to JSON string
                 data = new Gson().toJson(userMessage).getBytes();
+
+                // For best performance, you should call either setFixedLengthStreamingMode(int) when the body length is known in advance, or setChunkedStreamingMode(int) when it is not. Otherwise HttpURLConnection will be forced to buffer the complete request body in memory before it is transmitted, wasting (and possibly exhausting) heap and increasing latency.
+                size = data.length;
+                if (size > 0) {
+                    urlConnection.setFixedLengthStreamingMode(size);
+                } else {
+                    // Set default chunk size
+                    urlConnection.setChunkedStreamingMode(0);
+                }
+
+                // Get the OutputStream of HTTP client
+                out = new BufferedOutputStream(urlConnection.getOutputStream());
+                // Copy from file to the HTTP client
+                out.write(data);
+                // Make sure to close streams, otherwise "unexpected end of stream" error will happen
+                out.close();
+
+                // Set timeout
+                urlConnection.setReadTimeout(10000 /* milliseconds */);
+                urlConnection.setConnectTimeout(15000 /* milliseconds */);
+
+                // Send and get response
+                // getResponseCode() will automatically trigger connect()
+                int responseCode = urlConnection.getResponseCode();
+                String responseMsg = urlConnection.getResponseMessage();
+                Log.d(LOG_TAG, "Response " + responseCode + " " + responseMsg);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                urlConnection.disconnect();
+            }
+        }
+    }
+
+    private void sendTopicMessage() {
+        // Check network connection ability and then access Google Cloud Storage
+        ConnectivityManager connMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        if (networkInfo == null || !networkInfo.isConnected()) {
+            Toast.makeText(this, getString(R.string.no_network_connection_available), Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // Prepare data
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String instanceID = InstanceID.getInstance(this).getId();
+        String topic = editTextTopic.getText().toString();
+        String message = editTextMessage.getText().toString();
+        boolean flagRegisteredServer = sharedPreferences.getBoolean(MyConstants.SENT_TOKEN_TO_SERVER, false);
+        TopicMessage topicMessage = new TopicMessage(instanceID, topic, message);
+
+        // Registration
+        if (!flagRegisteredServer) {
+            Toast.makeText(this, "Server is inaccessible, maybe network is down", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Vernon debug
+        Log.d(LOG_TAG, "Send \"" + message + "\" to topic " + topic);
+
+        // Execute uploading thread
+        if (mSendTopicMessageTask != null && mSendTopicMessageTask.getStatus() == AsyncTask.Status.RUNNING) {
+            Log.d(LOG_TAG, "Last message is still sending");
+            Toast.makeText(this, "Last message is still sending, please wait", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mSendTopicMessageTask = new SendTopicMessageTask();
+        mSendTopicMessageTask.execute(topicMessage);
+    }
+
+    /**
+     * Implementation of AsyncTask, to send a member to the server in the background away from
+     * the UI thread and get the item URL generated by the server.
+     */
+    private class SendTopicMessageTask extends AsyncTask<TopicMessage, Void, Void> {
+
+        // Return the item URL generated by the server.
+        // Return null when failed
+        @Override
+        protected Void doInBackground(TopicMessage... args) {
+            // Deal with one message at a time
+            if (args.length < 1) {
+                Log.e(LOG_TAG, "No specified message");
+                return null;
+            }
+
+            try {
+                // Upload
+                send(args[0]);
+            } catch (IOException e) {
+                Log.e(LOG_TAG, e + "in sending an user message");
+            }
+
+            return null;
+        }
+
+        /**
+         * Uses the logging framework to display the output of the fetch
+         * operation in the log fragment.
+         */
+        @Override
+        protected void onPostExecute(Void arg) {
+            Log.d(LOG_TAG, "Finish sending a message to a topic");
+        }
+
+        // Send a message to the server in Google APP engine
+        private void send(TopicMessage topicMessage) throws IOException {
+            // Prepare URL https://aaa.appspot.com/api/0.1/user-messages
+            // The target user is myself
+            URL url = new URL(MyConstants.TOPIC_MESSAGE_URL);
+            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+            int size;
+            byte[] data;
+            OutputStream out;
+            // Set content type
+            urlConnection.setRequestProperty("Content-Type", "application/json");
+
+            try {
+                // To upload data to a web server, configure the connection for output using setDoOutput(true). It will use POST if setDoOutput(true) has been called.
+                urlConnection.setDoOutput(true);
+
+                // Convert item to JSON string
+                data = new Gson().toJson(topicMessage).getBytes();
 
                 // For best performance, you should call either setFixedLengthStreamingMode(int) when the body length is known in advance, or setChunkedStreamingMode(int) when it is not. Otherwise HttpURLConnection will be forced to buffer the complete request body in memory before it is transmitted, wasting (and possibly exhausting) heap and increasing latency.
                 size = data.length;

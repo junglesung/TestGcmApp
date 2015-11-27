@@ -50,9 +50,25 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send"
-        android:id="@+id/buttonSendMessage"
+        android:text="Send to me"
+        android:id="@+id/buttonSendUserMessage"
         android:layout_below="@+id/buttonGetToken"
+        android:layout_toEndOf="@+id/editTextMessage" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send to topic"
+        android:id="@+id/buttonSendTopicMessage"
+        android:layout_below="@+id/buttonSendUserMessage"
+        android:layout_toEndOf="@+id/editTextMessage" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send to group"
+        android:id="@+id/buttonSendGroupMessage"
+        android:layout_below="@+id/buttonSendTopicMessage"
         android:layout_toEndOf="@+id/editTextMessage" />
 
     <TextView
@@ -60,23 +76,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textViewTopic"
-        android:layout_below="@id/buttonSendMessage"
+        android:layout_below="@id/buttonSendGroupMessage"
         android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/editTextTopic"
-        android:layout_below="@+id/buttonSendMessage"
+        android:layout_below="@+id/buttonSendGroupMessage"
         android:layout_toEndOf="@id/textViewTopic"
-        android:text="TopicAAA" />
+        android:text="TopicAAA"
+        android:editable="false"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Subscribe"
         android:id="@+id/buttonSubscribeTopic"
-        android:layout_below="@+id/buttonSendMessage"
+        android:layout_below="@+id/buttonSendGroupMessage"
         android:layout_toEndOf="@+id/editTextTopic" />
 
     <Button
@@ -101,7 +118,8 @@
         android:id="@+id/editTextGroup"
         android:layout_below="@+id/buttonSubscribeTopic"
         android:layout_toEndOf="@id/textViewGroup"
-        android:text="GroupBBB"/>
+        android:text="GroupBBB"
+        android:editable="false" />
 
     <Button
         android:layout_width="wrap_content"
