@@ -197,7 +197,7 @@ public class RegistrationIntentService extends IntentService {
             int responseCode = urlConnection.getResponseCode();
             String responseMsg = urlConnection.getResponseMessage();
             Log.d(LOG_TAG, "Response " + responseCode + " " + responseMsg);
-            if (responseCode != HttpURLConnection.HTTP_NO_CONTENT) {
+            if (responseCode != HttpURLConnection.HTTP_OK) {
                 return -1;
             }
 
