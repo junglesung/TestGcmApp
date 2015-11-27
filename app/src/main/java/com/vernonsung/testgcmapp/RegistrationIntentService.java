@@ -16,6 +16,7 @@ import com.google.android.gms.iid.InstanceID;
 import com.google.gson.Gson;
 
 import java.io.BufferedOutputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -200,10 +201,18 @@ public class RegistrationIntentService extends IntentService {
                 return -1;
             }
 
-            // Get image URL
-            userUrl = urlConnection.getHeaderField("Location");
-            Log.d(LOG_TAG, "User URL " + userUrl);
+            // Get user ID from response body
+            InputStreamReader in = new InputStreamReader(urlConnection.getInputStream());
+            UserRegistrationResponse responseBody = new Gson().fromJson(in, UserRegistrationResponse.class);
+            String userId = responseBody.getUserid();
+            Log.d(LOG_TAG, "User ID " + userId);
 
+            // Save user ID to preference
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            String oldId = sharedPreferences.getString(MyConstants.USER_ID, "");
+            if (oldId != userId) {
+                sharedPreferences.edit().putString(MyConstants.USER_ID, userId).apply();
+            }
         } catch (Exception e) {
             e.printStackTrace();
             ret = -1;

@@ -5,8 +5,8 @@ package com.vernonsung.testgcmapp;
 public class UserMessage {
     // To authenticate a valid sender
     private String instanceid;
-    private String registrationtoken;
     // The message to the target user
+    private String userid;
     private String message;
 
     // Default constructor
@@ -14,9 +14,9 @@ public class UserMessage {
     }
 
     // Initialization constructor
-    public UserMessage(String instanceid, String registrationtoken, String message) {
+    public UserMessage(String instanceid, String userid, String message) {
         this.instanceid = instanceid;
-        this.registrationtoken = registrationtoken;
+        this.userid = userid;
         this.message = message;
     }
 
@@ -28,12 +28,12 @@ public class UserMessage {
         this.instanceid = instanceid;
     }
 
-    public String getRegistrationtoken() {
-        return registrationtoken;
+    public String getUserid() {
+        return userid;
     }
 
-    public void setRegistrationtoken(String registrationtoken) {
-        this.registrationtoken = registrationtoken;
+    public void setUserid(String userid) {
+        this.userid = userid;
     }
 
     public String getMessage() {

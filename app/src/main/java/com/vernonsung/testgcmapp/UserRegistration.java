@@ -1,6 +1,7 @@
 package com.vernonsung.testgcmapp;
 
 // Send to APP server to update registration token
+// Since it's going to convert to JSON format with GSON library parser, use lowercase property names.
 public class UserRegistration {
     private String instanceid;
     private String registrationtoken;
