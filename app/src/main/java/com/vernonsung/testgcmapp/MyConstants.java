@@ -19,6 +19,7 @@ public class MyConstants {
     public static final String USER_REGISTRATION_URL = APP_SERVER_URL_BASE + "/myself";
     public static final String USER_MESSAGE_URL = APP_SERVER_URL_BASE + "/user-messages";
     public static final String TOPIC_MESSAGE_URL = APP_SERVER_URL_BASE + "/topic-messages";
+    public static final String GROUP_URL = APP_SERVER_URL_BASE + "/groups";
 
     // Values
     public static final int URL_CONNECTION_READ_TIMEOUT = 10000;  // milliseconds
