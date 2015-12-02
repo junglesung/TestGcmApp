@@ -408,6 +408,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void arg) {
             Log.d(LOG_TAG, "Finish sending a message to a user");
+            Toast.makeText(getApplicationContext(), "Finish sending a message to a user", Toast.LENGTH_SHORT).show();
         }
 
         // Send a message to the server in Google APP engine
@@ -531,6 +532,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void arg) {
             Log.d(LOG_TAG, "Finish sending a message to a topic");
+            Toast.makeText(getApplicationContext(), "Finish sending a message to a topic", Toast.LENGTH_SHORT).show();
         }
 
         // Send a message to the server in Google APP engine
