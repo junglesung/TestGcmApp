@@ -1,22 +1,22 @@
 package com.vernonsung.testgcmapp;
 
-// HTTP body of sending a message to a topic
+// HTTP body of sending a message to a group
 // Since it's going to convert to JSON format with GSON library parser, use lowercase property names.
-public class TopicMessage {
+public class GroupMessage {
     // To authenticate a valid sender
     private String instanceid;
     // The message to the target user
-    private String topic;
+    private String groupName;
     private String message;
 
     // Default constructor
-    public TopicMessage() {
+    public GroupMessage() {
     }
 
     // Initialization constructor
-    public TopicMessage(String instanceid, String topic, String message) {
+    public GroupMessage(String instanceid, String groupName, String message) {
         this.instanceid = instanceid;
-        this.topic = topic;
+        this.groupName = groupName;
         this.message = message;
     }
 
@@ -28,12 +28,12 @@ public class TopicMessage {
         this.instanceid = instanceid;
     }
 
-    public String getTopic() {
-        return topic;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setTopic(String topic) {
-        this.topic = topic;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public String getMessage() {
